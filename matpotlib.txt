@@ -1,0 +1,238 @@
+
+65C0EEE294
+
+
+data=read.csv(file.choose(), header = TRUE, sep = ",", quote = "\"")
+da<-dataa[,10]
+View(data)
+pairs(data)
+names(data)
+#model de regression lineaire
+modele <- lm(Y.house.price.of.unit.area~.,data=data)
+modele$coefficients
+
+summary(modele)
+summary(modele)$coefficients
+
+step(modele)
+
+
+#Intervalles de confiance des paramètres
+confint(modele)
+
+plot(fitted(modele),resid(modele),xlab="valeur ajustée",ylab="résidu")
+
+
+###procesure de selection de ficher
+#Etape 1
+
+nva<-ncol(data)
+Fish = rep(0,nva-2)
+
+
+for (i in  2:10 ) {
+  mod1<-lm(data[,11]~data[,i])
+  Fish[i]=var(predict(mod1))*(nrow(data)-1)/(deviance(mod1)/df.residual(mod1))
+}
+Fish
+df2=nrow(data)-2
+df2
+1-pf(max(Fish),1,df2)
+#le variable 4 cest lui qui a le plus grand F et 3ando  p_value <10% donc va entrer
+
+### Introduction de la variable X3.distance.to.the.nearest.MRT.station
+
+nva<-ncol(data)
+Fish = rep(0,nva-3)
+
+
+SCR1<-deviance(lm(data[,11]~data[,4]))
+for (i in c(2,3,5,6,7,8,9,10)) {
+  mod<-lm(data[,11]~data[,4]+data[,i])
+  SCR2=deviance(mod)
+  Fish[i]=(SCR1-SCR2)/(SCR2/(nrow(data)-3))
+}
+Fish
+df2=nrow(data)-3
+df2
+1-pf(max(Fish),1,df2)
+
+#introduction de variable 3 = x2.house.age car le plus grand F et 3ando  p_value <10% donc va entrer
+#introduction de variable X2.house
+
+
+#existe il des variable  a sortir test de retrait
+
+
+Fish = rep(0,2)
+SCR2=deviance(lm(data[,11]~data[,4]+data[,3]))
+mod<-lm(data[,11]~data[,4])
+SCR1<-deviance(mod)
+Fish[1]=(SCR1-SCR2)/(SCR2/(nrow(data)-3))
+
+mod<-lm(data[,11]~data[,3])
+SCR1=deviance(mod)
+Fish[2]=(SCR1-SCR2)/(SCR2/(nrow(data)-3))
+Fish
+df2=nrow(data)-3
+df2
+1-pf(min(Fish),1,df2)
+
+## Aucune variable n'est retitée, les F sont significatifs 
+nva=ncol(data)
+Fish = rep(0,nva-4)
+SCR2<-deviance(lm(data[,11]~data[,4]+data[,3]))
+for (i in c(2,5,6,7,8,9,10)) {
+  mod<-lm(data[,11]~data[,4]+data[,3]+data[,i])
+  SCR3=deviance(mod)
+  Fish[i]=(SCR2-SCR3)/(SCR3/(nrow(data)-4))
+}
+Fish
+df2=nrow(data)-4
+df2
+1-pf(max(Fish),1,df2)
+
+#le variable 2 va entrer
+
+#maintenat tesr de retirait
+
+SCR3<-deviance(lm(data[,11]~data[,2]+data[,3]+data[,4]))
+########
+Fish<-rep(0,3)
+mod<-lm(data[,11]~data[,2]+data[,3])
+SCR2<-deviance(mod)
+Fish[1]=(SCR2-SCR3)/(SCR3/(nrow(data)-4))
+
+mod<-lm(data[,11]~data[,2]+data[,4])
+SCR2<-deviance(mod)
+Fish[2]=(SCR2-SCR3)/(SCR3/(nrow(data)-4))
+
+mod<-lm(data[,11]~data[,3]+data[,4])
+SCR2<-deviance(mod)
+Fish[3]=(SCR2-SCR3)/(SCR3/(nrow(data)-4))
+
+Fish
+df2=nrow(data)-4
+df2
+1-pf(min(Fish),1,df2)
+
+## Aucune variable n'est retitée, les F sont significatifs 
+
+
+##### Etape 4 -Introduction-
+Fish<-rep(0,6)
+SCR2<-deviance(lm(data[,11]~data[,2]+data[,3]+data[,4]))
+
+for (i in c(5,6,7,8,9,10)) {
+  mod<-lm(data[,11]~data[,2]+data[,3]+data[,4]+data[,i])
+  SCR3=deviance(mod)
+  Fish[i]=(SCR2-SCR3)/(SCR3/(nrow(data)-5))
+}
+Fish
+df2=nrow(data)-5
+df2
+1-pf(max(Fish),1,df2)
+
+
+#le variable 6 va entrer
+#test de retirer
+
+
+
+#### Etape 4 -Retrait-
+Fish = rep(0,4)
+SCR4<-deviance(lm(data[,11]~data[,2]+data[,3]+data[,4]+data[,6]))
+mod<-lm(data[,11]~data[,2]+data[,3]+data[,4])
+SCR3<-deviance(mod)
+Fish[1]<-(SCR3-SCR4)/(SCR4/(nrow(data)-5))
+
+mod<-lm(data[,11]~data[,2]+data[,3]+data[,6])
+SCR3<-deviance(mod)
+Fish[2]<-(SCR3-SCR4)/(SCR4/(nrow(data)-5))
+
+mod<-lm(data[,11]~data[,2]+data[,4]+data[,6])
+SCR3<-deviance(mod)
+Fish[3]<-(SCR3-SCR4)/(SCR4/(nrow(data)-5))
+
+mod<-lm(data[,11]~data[,3]+data[,4]+data[,6])
+SCR3<-deviance(mod)
+Fish[4]<-(SCR3-SCR4)/(SCR4/(nrow(data)-5))
+
+Fish
+df2=nrow(data)-5
+df2
+1-pf(min(Fish),1,df2)
+
+#Aucune variable n'est retitée, les F sont significatifs 
+
+
+Fish<-rep(0,6)
+SCR2<-deviance(lm(data[,11]~data[,2]+data[,3]+data[,4]+data[,6]))
+
+for (i in c(5,7,8,9,10)) {
+  mod<-lm(data[,11]~data[,2]+data[,3]+data[,4]+data[,6]+data[,i])
+  SCR3=deviance(mod)
+  Fish[i]=(SCR2-SCR3)/(SCR3/(nrow(data)-6))
+}
+Fish
+df2=nrow(data)-6
+df2
+1-pf(max(Fish),1,df2)
+#le variable 5 va entrer
+#test de retirer
+
+
+
+Fish = rep(0,5)
+SCR4<-deviance(lm(data[,11]~data[,2]+data[,3]+data[,4]+data[,5]+data[,6]))
+mod<-lm(data[,11]~data[,2]+data[,3]+data[,4]+data[,5])
+SCR3<-deviance(mod)
+Fish[1]<-(SCR3-SCR4)/(SCR4/(nrow(data)-6))
+
+mod<-lm(data[,11]~data[,2]+data[,3]+data[,4]+data[,6])
+SCR3<-deviance(mod)
+Fish[2]<-(SCR3-SCR4)/(SCR4/(nrow(data)-6))
+
+mod<-lm(data[,11]~data[,2]+data[,3]+data[,5]+data[,6])
+SCR3<-deviance(mod)
+Fish[3]<-(SCR3-SCR4)/(SCR4/(nrow(data)-6))
+
+mod<-lm(data[,11]~data[,3]+data[,4]+data[,5]+data[,6])
+SCR3<-deviance(mod)
+Fish[4]<-(SCR3-SCR4)/(SCR4/(nrow(data)-6))
+
+
+mod<-lm(data[,11]~data[,2]+data[,4]+data[,5]+data[,6])
+SCR3<-deviance(mod)
+Fish[5]<-(SCR3-SCR4)/(SCR4/(nrow(data)-6))
+Fish
+df2=nrow(data)-6
+df2
+
+1-pf(min(Fish),1,df2)
+#aucun variable retirait
+
+Fish<-rep(0,6)
+SCR2<-deviance(lm(data[,11]~data[,2]+data[,3]+data[,4]+data[,5]+data[,6]))
+
+for (i in c(7,8,9,10)) {
+  mod<-lm(data[,11]~data[,2]+data[,3]+data[,4]+data[,5]+data[,6]+data[,i])
+  SCR3=deviance(mod)
+  Fish[i]=(SCR2-SCR3)/(SCR3/(nrow(data)-7))
+}
+Fish
+df2=nrow(data)-7
+df2
+1-pf(max(Fish),1,df2)
+
+
+#donc c'est fini car on pèvalue =0.16>0.1 test d'arret
+
+
+modele <- lm(Y.house.price.of.unit.area~data[,2]+data[,3]+data[,4]+data[,5]+data[,6],data=data)
+modele$coefficients
+
+summary(modele)
+summary(modele)$coefficients
+
+
